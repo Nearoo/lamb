@@ -1,9 +1,25 @@
+import sys
+import types
+import string
 
-_noarg = object()
+import importlib.machinery as imach
+import importlib.util as iutil
+import importlib.abc as iabc
 
 class _LambdaFactory:
     def __init__(self, chain=[lambda x: x]):
         self.__chain = chain
+        self.__name = '🐑'
+        class Iface:
+            @property
+            def name(_):
+                return self.__name
+
+            @name.setter
+            def name(_, name):
+                self.__name = name
+
+        self._ = Iface()
     
     def __enchain(self, fun):
         return _LambdaFactory(self.__chain + [fun])
@@ -161,3 +177,49 @@ class _LambdaFactory:
 
 
 lamb = _LambdaFactory()
+
+class _DynamicLambGenerator(types.ModuleType):
+    __varnames = string.ascii_lowercase
+
+    def __init__(self, prefix, suffix):
+        super().__init__(name="varname_generation")
+        self.__all__ = list(map(
+            prefix + lamb + suffix,
+            self.__varnames
+        ))
+
+    def __getattr__(self, name):
+        if name in self.__all__:
+            return lamb  # 🐑
+        else:
+            raise AttributeError
+
+
+class _DynamicLambMetaPathFinder(iabc.MetaPathFinder):
+    base_name = "vs"
+
+    def find_spec(self, fullname, path, target=None):
+        modname = fullname.split(".")[-1]
+        if self.base_name in modname:
+            prefix, suffix = modname.split(self.base_name, 1)
+            return imach.ModuleSpec(
+                name=fullname,
+                loader=_DynamicLambLoader(prefix, suffix)
+            )
+
+
+class _DynamicLambLoader:
+    def __init__(self, prefix, suffix):
+        self.p, self.s = prefix, suffix
+
+    def exec_module(self, spec):
+        pass
+
+    def create_module(self, spec):
+        return _DynamicLambGenerator(self.p, self.s)
+
+
+# Make module package
+__path__ = []
+# Add "vs" as module
+sys.meta_path.append(_DynamicLambMetaPathFinder())
