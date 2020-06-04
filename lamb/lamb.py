@@ -6,20 +6,26 @@ import importlib.machinery as imach
 import importlib.util as iutil
 import importlib.abc as iabc
 
+
+def lamb_function(fun):
+    """ Turns a function into a lamb function that can be applied to lambs for later usage """
+    def new_fun(lamb):
+        return lamb._.enchain(lambda a: fun(a))
+
+    new_fun.__qualname__ = f"{fun.__name__}.🐑"
+    return new_fun
+
 class _LambdaFactory:
     def __init__(self, chain=[lambda x: x]):
         self.__chain = chain
-        self.__name = '🐑'
         class Iface:
-            @property
-            def name(_):
-                return self.__name
+            def __init__(self, lamb):
+                self._lamb = lamb
 
-            @name.setter
-            def name(_, name):
-                self.__name = name
+            def __getattr__(self, attrname):
+                return getattr(self._lamb, f"{self._lamb.__class__.__name__}__{attrname}")
 
-        self._ = Iface()
+        self._ = Iface(self)
     
     def __enchain(self, fun):
         return _LambdaFactory(self.__chain + [fun])
@@ -46,23 +52,10 @@ class _LambdaFactory:
             return f
 
     def __getattr__(self, name):
-        try:
-            return self.__getattribute__(name)
-        except AttributeError:
-            return self.__enchain(lambda a: getattr(a, name))
+        return self.__enchain(lambda a: getattr(a, name))
     
     def __getitem__(self, b):
         return self.__enchain(lambda a: a[b])
-    
-    def __iter__(self):
-        return self.__enchain(lambda a: iter(a))
-    
-    def __next__(self):
-        print("Hello")
-        return self.__enchain(lambda a: next(a))
-    
-    def __list__(self):
-        return self.__enchain(lambda a: list(a))
 
     # Comparators
 
@@ -178,6 +171,7 @@ class _LambdaFactory:
 
 lamb = _LambdaFactory()
 
+# Create dynamic lamb names with post- and prefixes
 class _DynamicLambGenerator(types.ModuleType):
     __varnames = string.ascii_lowercase
 
@@ -219,7 +213,7 @@ class _DynamicLambLoader:
         return _DynamicLambGenerator(self.p, self.s)
 
 
-# Make module package
+# Make module to a package
 __path__ = []
-# Add "vs" as module
+# Make all packages containing "vs" discoverable
 sys.meta_path.append(_DynamicLambMetaPathFinder())

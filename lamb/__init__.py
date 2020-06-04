@@ -1,1 +1,1 @@
-from .lamb import lamb
+from .lamb import *
