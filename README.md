@@ -3,7 +3,7 @@ This module introduces a new way to express small functions in a compact and int
 
 ```python
 from lamb import *
-# Primary purpose: Create small anonymous functions
+# Primary purpose: Creating small anonymous functions
 res = filter(lamb % 5 < 3, range(30))
 
 # Arbitrary arithmetic and boolean operators are allowed:
@@ -25,8 +25,9 @@ g = (l_a_ - b) * c
 # g is now a function of three arguments, or rather: functions returning functions,
 # with one argument each (shoutout to Haskell)
 g(1)(2)(3) == g(1, 2)(3) == g(1, 2, 3)
-print(g(1, 2, 3))
-# OUTPUT: -3, arguments replace lambs left-to-right
+
+# Arguments replace lambs left-to-right. The following will output -3:
+g(1, 2, 3)
 
 # Note that `a_ is b_` and `a_ is lamb`; they differ only in their identifier. 
 # In other words, the following are equivalent:
