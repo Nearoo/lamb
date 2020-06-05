@@ -1,140 +1,44 @@
-# Lamb 🐑: Concise Function Description in Python
-
+# Lamb 🐑: Concise Function Expression in Python
+This module introduces a new way to express small functions in a compact and intutive way using a single object called `lamb`. Any expression in which a `lamb` appears turns into a function of which `lamb` is a parameter. Check `demo.py` to see a demonstration:
 
 ```python
 from lamb import *
+# Primary purpose: Create small anonymous functions
+res = filter(lamb % 5 < 3, range(30))
+
+# Arbitrary arithmetic and boolean operators are allowed:
+f   = (lamb ** 2 % 6) - 28 != 5 / 4
+f_l = lambda x: (x ** 2 % 6) - 28 != 5 / 4
+f(2) == f_l(2) # The two expressions are equivalent
+
+# Empty function calls, index and attribute access are possible as well
+g = lamb().x[2] - 3 == None
+
+# Lambs can be chained with other functions using the righshift operator
+h = g >> f >> lamb + 2 # make sure the first function is a lamb
+
+# For multi-variable lambs, different lamb names improve clarity
+from lamb.vs import * # Imports a, b, c, ..., z
+from lamb.l_vs_ import * # Import l_a_, l_b_, l_c_... arbitrary pre- and postfixes are possible
+g = (l_a_ - b) * c
+
+# g is now a function of three arguments, or rather: functions returning functions, with one arg each (shoutout to Haskell)
+g(1)(2)(3) == g(1, 2)(3) == g(1, 2, 3)
+print(g(1, 2, 3))
+# OUTPUT: -3, arguments replace lambs left-to-right
+
+# Note that `a_ is b_` and `a_ is lamb`; they differ only in their identifier, so the following are equivalent:
+g2 = (lamb - lamb) * lamb
+g(1, 2, 3) == g2(1, 2, 3)
+
+# Lambs can be nested. Parents inherit un-evaluated lambs from their children.
+# For clarity, lambs can be added as placeholder for unevaluated args:
+h  = g(1, 2) + g(3) 
+h2 = g(1, 2, a) + g(3, a, b)
+h(1, 2, 3) == h2(1, 2, 3)
+
+# In a select few cases, this will work, but is discouraged. Use g = lamb >> f instead.
+f = lambda x: x + 2 == 5
+g = f(lamb)
+f(2) == g(2)
 ```
-
-## Introduction
-
-This module allows to express simple functions in a compact and intuitive way using a single object called `lamb`. 
-
-
-`lamb`s can be thought of as placeholder for variables inside an expression. The expression can then be evaluated as if it was a function, where each `lamb` gets replaced with a function argument.
-
-For instance, the following line filters all elements from a list who's `mod-4` equivalence is not greater than 2:
-
-
-```python
-filtered = filter(lamb % 4 > 2, range(10))
-
-print(list(filtered))
-```
-
-## Arithmetic and Boolean Operators
-Arithmetic operations and boolean comparators can also be freely chained together to create more complex expressions:
-
-
-```python
-f = (lamb ** 2 + 30) % 15 == 10
-
-f(5)
-```
-
-## Function Chaining
-There is also the possibility to chain arbitrary functions. The rightshift operator (`>>`) is overloaded such that if it is called with functions as arguments, it chains them together:
-
-
-```python
-def a(x):
-    return x + 2
-
-def b(y):
-    return y * 3
-
-g = (lamb >> a >> b) % 4
-
-g(4)
-```
-
-
-
-
-    2
-
-
-
-## Attribute, Methods and Indexes
-`lamb` can also be used to create functions applicable on class instances; getting attributes, calling methods or accessing  indexed data works as would intuitively be expected:
-
-
-```python
-class A:
-    def x(self):
-        return [1, 2, 3]
-    
-
-f = lamb.x()[2]
-
-f(A())
-```
-
-
-
-
-    3
-
-
-
-## Applying builting functions
-To apply builtin functions to an object, `lamb` provides a submodule containing deferred versions of all builtin functions. They can be invoked by writing the original function name but with a trailing underscore `_`:
-
-
-```python
-from lamb.builtins_ import *
-
-a = {1:2}
-l = list_(lamb.values())
-
-print(l(a))
-```
-
-    [2]
-
-
-## Multi-Lamb Expressions, Dynamic Lamb Generators
-There can also be multiple lambs in a single expression. When called, arguments are then applied to the lambs from left to right. This can be slightly confusing, since intuitively, lambs look like variables, and the same variable should get the same value. It's thus a good idea to rename the lambs to different variable names.
-
-
-```python
-x = y = z = lamb
-f = (x + y) * z
-f(1, 2, 3)
-```
-
-
-
-
-    9
-
-
-
-But writing `x = y = z = lamb` each time a new multi-lamb expression is created is a bit tedious and the defeats the purpose of lambs overall. There's thus a submodule called `vs` provided that generates lamb-names for all letters in the alphabet. To avoid name-clashes in the current namespace, we can dynamically add pre- and postfixes to all lamb-names by adding pre- and postfixes to the module name `vs`:
-
-
-```python
-from lamb.vs import *
-print(a, b, c, x, y, z)
-
-from lamb.__vs_pfix import *
-from lamb.obj_vs import *
-
-print(__a_pfix, __c_pfix, obj_a, obj_b)
-```
-
-    🐑 🐑 🐑 🐑 🐑 🐑
-    🐑 🐑 🐑 🐑
-
-
-## Partial Application
-Partial application is possible as well. Nothing is required but calling with fewer arguments.
-
-
-```python
-f = (x + y) * z
-
-print(f(1, 2)(3))
-```
-
-    9
-
