@@ -19,15 +19,17 @@ h = g >> f >> lamb + 2 # make sure the first function is a lamb
 
 # For multi-variable lambs, different lamb names improve clarity
 from lamb.vs import * # Imports a, b, c, ..., z
-from lamb.l_vs_ import * # Import l_a_, l_b_, l_c_... arbitrary pre- and postfixes are possible
+from lamb.l_vs_ import * # Import l_a_, l_b_, .. arbitrary pre- and postfixes are possible
 g = (l_a_ - b) * c
 
-# g is now a function of three arguments, or rather: functions returning functions, with one arg each (shoutout to Haskell)
+# g is now a function of three arguments, or rather: functions returning functions,
+# with one arg each (shoutout to Haskell)
 g(1)(2)(3) == g(1, 2)(3) == g(1, 2, 3)
 print(g(1, 2, 3))
 # OUTPUT: -3, arguments replace lambs left-to-right
 
-# Note that `a_ is b_` and `a_ is lamb`; they differ only in their identifier, so the following are equivalent:
+# Note that `a_ is b_` and `a_ is lamb`; they differ only in their identifier, 
+# so the following are equivalent:
 g2 = (lamb - lamb) * lamb
 g(1, 2, 3) == g2(1, 2, 3)
 
@@ -37,7 +39,8 @@ h  = g(1, 2) + g(3)
 h2 = g(1, 2, a) + g(3, a, b)
 h(1, 2, 3) == h2(1, 2, 3)
 
-# In a select few cases, this will work, but is discouraged. Use g = lamb >> f instead.
+# In a select few cases, this will work, but is discouraged. 
+# Use g = lamb >> f instead.
 f = lambda x: x + 2 == 5
 g = f(lamb)
 f(2) == g(2)
