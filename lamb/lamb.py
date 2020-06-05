@@ -6,35 +6,12 @@ import importlib.machinery as imach
 import importlib.util as iutil
 import importlib.abc as iabc
 
-
-def lamb_function(fun):
-    """ Turns a function into a lamb function that can be applied to lambs for later usage """
-    def new_fun(lamb):
-        return lamb._.enchain(lambda a: fun(a))
-
-    new_fun.__qualname__ = f"{fun.__name__}.🐑"
-    return new_fun
-
 class _LambdaFactory:
     def __init__(self, chain=[lambda x: x]):
         self.__chain = chain
-        class Iface:
-            def __init__(self, lamb):
-                self._lamb = lamb
-
-            def __getattr__(self, attrname):
-                return getattr(self._lamb, f"{self._lamb.__class__.__name__}__{attrname}")
-
-        self._ = Iface(self)
     
     def __enchain(self, fun):
         return _LambdaFactory(self.__chain + [fun])
-
-    def __iter__(self):
-        return self.__chain
-
-    def __reversed__(self):
-        return _LambdaFactory(reversed(self.__chain))
 
     def __call__(self, *args):
         argc = len(args)
@@ -161,6 +138,8 @@ class _LambdaFactory:
 
     def __ror__(self, a):
         return self.__enchain(lambda b: a | b)
+    
+    # Representations
 
     def __repr__(self):
         return f"<LambdaFactory | functions: {self.__chain}>"
