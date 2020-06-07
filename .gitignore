@@ -1,4 +1,15 @@
-__pycache__/*
-Tests.ipynb
-.*/*
-*__pycache__*
+# Python 
+__pycache__/
+
+# Build
+build/
+dist/
+lamb_sgyger.egg-info/
+
+# Hidden
+.*/
+.*
+
+# Test files
+tryout.py
+tryout.ipynb
