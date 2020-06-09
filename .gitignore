@@ -4,7 +4,7 @@ __pycache__/
 # Build
 build/
 dist/
-lamb_sgyger.egg-info/
+lamb.egg-info/
 
 # Hidden
 .*/
