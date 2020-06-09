@@ -1,3 +1,5 @@
+# Copyright (c) 2020 Silas Gyger
+
 import sys
 import types
 import string

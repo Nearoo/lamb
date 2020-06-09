@@ -45,3 +45,10 @@ f = lambda x: x + 2 == 5
 g = f(lamb)
 f(2) == g(2)
 ```
+
+## Installation
+`lamb` is installable from PyPI:
+
+```
+python -m pip install lamb
+```
