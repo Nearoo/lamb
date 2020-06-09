@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="lamb",
-    version="0.0.1",
+    version="0.0.1.post1",
     author="Silas Gyger",
     author_email="silasgyger@gmail.com",
     description="Express lambdas without `lamdbda`",
